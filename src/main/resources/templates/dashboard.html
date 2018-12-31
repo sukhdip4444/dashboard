@@ -1,0 +1,599 @@
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<title>Dashboard</title>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+ <link rel="stylesheet" type="text/css" href="/style.css"> 
+ <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/emn178/chartjs-plugin-labels/src/chartjs-plugin-labels.js"></script>
+
+</head>
+
+<body >
+
+  <div class="heading">
+   <h1>PRISM Dashboard</h1>
+  </div>
+   
+
+<div class="container-fluid">
+    <div class="row mb-2">
+        <div class="col col-md">
+            <div class="card" >
+                <div class="card-body mb-3" style="height:400px; width:400px">
+                    <canvas id="pieChart1" ></canvas>
+                    <a th:href="${'/pdfReportPieChart1'}" id="pdfReportPieChart1">Export to <img src="pdf_preview.png" style="height:20px; width:20px"> </a>
+                </div>
+            </div>
+        </div>
+        <div class="col col-md">
+            <div class="card" >
+                <div class="card-body" style="height:400px; width:600px">
+                    <canvas id="pieChart2" style="height:400px; "></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col col-md">
+            <div class="card" >
+                <div class="card-body" style="height:400px; width:600px">
+                    <canvas id="lineChart1" style="height:400px; "></canvas>
+                </div>
+            </div>
+        </div>
+        <!--  
+        <div class="col">
+        	<div class="card">
+        		<div class="card-body">
+        		<form method="get">
+        					Project id : <input type="text" name="project_id" class="form-control mb-2">
+        					<button type="submit" class="btn btn-default">Enter </button>
+        				</form>
+        			<canvas id="">
+        				
+        			 </canvas>
+        		</div>
+        	</div>
+        </div>
+        -->
+     </div>
+     <div class="row">
+     	<div class="col col-md">
+     		<div class="card" style="height:400px; ">
+     			<div class="card-body">
+     				<canvas id="barChart1"></canvas>
+     			</div>
+     		</div>
+     	</div>
+     	<div class="col col-md">
+     		<div class="card" style="height:400px;">
+     			<div class="card-body">
+     				<canvas id="barChart2"></canvas>
+     			</div>
+     		</div>
+     	</div>
+     	<div class="col col-md">
+     		<div class="card" style="height:400px; ">
+     			<div class="card-body">
+     				<canvas id="barChart3"></canvas>
+     			</div>
+     		</div>
+     	</div>
+     </div>     
+      <div class="row mt-2">
+     	<div class="col col-md">
+     		<div class="card" style="height:400px; ">
+     			<div class="card-body">
+     			    				
+					<div class="form-group blu-margin" id="link1">
+    					<select class="form-control"  id="dropOperator">
+    						<option value="0">Select Project id and name</option>
+    						<option th:each="data : ${dropdownData}" th:value="${data.id}" th:text="${data.id + ' :: ' + data.title}" ></option>
+    						<div id="link" hidden><a href="/dashboard/${data.id}">Get data</a></div>
+    						<script type="text/javascript">
+								$(function(){
+		
+								$("#dropOperator").on("change", function() {
+									//document.getElementById("link").style.display = "visible";
+									 var h1 = document.createElement("a");
+								        h1.appendChild(document.createTextNode("Get data"));
+								        document.getElementById("link1").appendChild(h1);
+									console.log($("#dropOperator").val());
+								  // $("#SelectedvendorText").val();
+								// });
+								});
+								});
+							</script>
+    					</select>
+					</div>
+     				<canvas></canvas>
+     			</div>
+     		</div>
+     	</div>     	
+     </div>     
+</div>
+
+
+	
+<script  th:inline="javascript">
+	/*<![CDATA[*/
+
+    var data1 = /*[[${data}]]*/ null;
+    var dataPoints1=data1.map(function(e){
+    	return e.count;
+    })
+    var labels1=data1.map(function(e){
+    	return e.status_desc;
+    })
+    /*]]>*/
+
+    
+    //global options
+     Chart.defaults.global.legend.position='bottom';
+   
+    
+    let myChart1=document.getElementById("pieChart1").getContext('2d');
+    
+    let popChart1=new Chart(myChart1,{
+    
+    	type: 'pie',
+        data: {
+            labels: labels1,
+            datasets: [{
+                label: '',
+                data: dataPoints1,
+                backgroundColor: [
+                    '#0C8BE8',
+                    '#045933',
+                    '#FF2D19',
+                    '#F2B134',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+        	// responsive: false,
+        	// maintainAspectRatio: false,
+             
+        title: {
+                display: true,
+                text: 'PAC Status'
+              },
+        layout: {
+                  padding: {
+                      left: 50,
+                      right: 0,
+                      top: 0,
+                      bottom: 0
+                  }
+              },
+              plugins: {
+                  labels: {
+                	  render: 'percentage',
+                	    fontColor: 'white',
+                	    precision: 2
+                  }
+              }
+
+        }
+    });
+
+
+</script>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+    var data2 = /*[[${hostingData}]]*/ null;
+    var dataPoints2=data2.map(function(e){
+    	return e.count;
+    })
+    var labels2=data2.map(function(e){
+    	return e.hosting;
+    })
+    /*]]>*/
+    
+    
+    //global options
+     Chart.defaults.global.legend.position='bottom';
+    
+    
+    let myChart2=document.getElementById("pieChart2").getContext('2d');
+    
+    let popChart2=new Chart(myChart2,{
+    	type: 'pie',
+        data: {
+            labels: labels2,
+            datasets: [{
+                label: '',
+                data: dataPoints2,
+                backgroundColor: [
+                	'#0C8BE8',
+                    '#045933',
+                    '#FF2D19',
+                    '#F2B134',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+        
+        title: {
+                display: true,
+                text: 'Hosting Statistics'
+              },
+        layout: {
+                  padding: {
+                      left: 50,
+                      right: 0,
+                      top: 0,
+                      bottom: 0
+                  }
+              },
+              plugins: {
+                  labels: {
+                	  render: 'percentage',
+                	    fontColor: 'white',
+                	    precision: 2
+                  }
+              }
+              
+       
+        }
+    });
+
+</script>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+    var data3 = /*[[${hodData}]]*/ null;
+    var dataPoints3=data3.map(function(e){
+    	return e.count;
+    })
+    var labels3=data3.map(function(e){
+    	return e.hod;
+    })
+    /*]]>*/
+   
+    
+    //global options
+   
+    
+    let myChart3=document.getElementById("barChart1").getContext('2d');
+    
+    let popChart3=new Chart(myChart3,{
+    	type: 'bar',
+        data: {
+            labels: labels3,
+            datasets: [{
+                label: 'Number of projects',
+                data: dataPoints3,
+                backgroundColor: [
+                	'#0C8BE8',
+                    '#045933',
+                    '#FF2D19',
+                    '#F2B134',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+        	 scales: {
+                 yAxes: [{
+                     ticks: {
+                         beginAtZero: true
+                     }
+                 }],
+                 xAxes: [{
+                     // Change here
+                 	barPercentage: 0.5
+                 }]
+             },
+        
+        title: {
+                display: true,
+                text: 'HOD wise projects submitted'
+              },
+        layout: {
+                  padding: {
+                      left: 50,
+                      right: 0,
+                      top: 0,
+                      bottom: 0
+                  }
+              },
+         legend:{
+        	 display:false
+         },
+         plugins: {
+             labels: {
+           	  render: 'percentage',
+           	    fontColor: 'white',
+           	    precision: 2
+             }
+         }
+       
+        }
+    });
+
+</script>
+	
+	
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+    var data4 = /*[[${costWiseData}]]*/ null;
+    var dataPoints4=data4.map(function(e){
+    	return e.sum;
+    })
+    var labels4=data4.map(function(e){
+    	return e.state_name;
+    })
+    /*]]>*/
+   
+    
+    //global options
+   
+    
+    let myChart4=document.getElementById("barChart2").getContext('2d');
+    
+    let popChart4=new Chart(myChart4,{
+    	type: 'bar',
+        data: {
+            labels: labels4,
+            datasets: [{
+                label: 'Total Cost',
+                data: dataPoints4,
+                backgroundColor: [
+                	'#0C8BE8',
+                    '#045933',
+                    '#FF2D19',
+                    '#F2B134',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+        	 scales: {
+                 yAxes: [{
+                     ticks: {
+                         beginAtZero: true
+                     }
+                 }],
+                 xAxes: [{
+                     // Change here
+                 	barPercentage: 0.5
+                 }]
+             },
+        
+        title: {
+                display: true,
+                text: 'Costwise/Statewise projects submitted'
+              },
+        layout: {
+                  padding: {
+                      left: 50,
+                      right: 0,
+                      top: 0,
+                      bottom: 0
+                  }
+              },
+         legend:{
+        	 display:false
+         },
+         plugins: {
+             labels: {
+           	  render: 'percentage',
+           	    fontColor: 'white',
+           	    precision: 2
+             }
+         }
+       
+        }
+    });
+
+</script>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+    var data5 = /*[[${stateWiseData}]]*/ null;
+    var dataPoints5=data5.map(function(e){
+    	return e.count;
+    })
+    var labels5=data5.map(function(e){
+    	return e.state_name;
+    })
+    /*]]>*/
+   
+    
+    //global options
+   
+    
+    let myChart5=document.getElementById("barChart3").getContext('2d');
+    
+    let popChart5=new Chart(myChart5,{
+    	type: 'bar',
+        data: {
+            labels: labels5,
+            datasets: [{
+                label: 'Number of Projects',
+                data: dataPoints5,
+                backgroundColor: [
+                	'#0C8BE8',
+                    '#045933',
+                    '#FF2D19',
+                    '#F2B134',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+        	 scales: {
+                 yAxes: [{
+                     ticks: {
+                         beginAtZero: true
+                     }
+                 }],
+                 xAxes: [{
+                     // Change here
+                 	barPercentage: 0.5
+                 }]
+             },
+        
+        title: {
+                display: true,
+                text: 'Statewise projects submitted'
+              },
+        layout: {
+                  padding: {
+                      left: 50,
+                      right: 0,
+                      top: 0,
+                      bottom: 0
+                  }
+              },
+         legend:{
+        	 display:false
+         },
+         plugins: {
+             labels: {
+           	  render: 'percentage',
+           	    fontColor: 'white',
+           	    precision: 2
+             }
+         }
+       
+        }
+    });
+
+</script>
+<script th:inline="javascript">
+/*<![CDATA[*/
+
+    var data6 = /*[[${monthWiseData}]]*/ null;
+    var dataPoints6=data6.map(function(e){
+    	return e.count;
+    })
+    var labels6=data6.map(function(e){
+    	return e.month;
+    })
+    /*]]>*/
+    
+    var newLabels= new Array();
+    for(var i=0;i<labels6.length;i++){
+    	console.log(labels6[i]);
+    	switch(labels6[i]){
+       case '1':newLabels[i]='Jan'
+        	break;
+       case '2':newLabels[i]='Feb'
+       	break;
+       case '3':newLabels[i]='Mar'
+       	break;
+       case '4':newLabels[i]='Apr'
+       	break;
+       case '5':newLabels[i]='May'
+       	break;
+       case '6':newLabels[i]='Jun'
+       	break;
+       case '7':newLabels[i]='Jul'
+       	break;
+       case '8':newLabels[i]='Aug'
+       	break;
+       case '9':newLabels[i]='Sept'
+       	break;
+       case '10':newLabels[i]='Oct'
+       	break;
+       case '11':newLabels[i]='Nov'
+       	break;
+       case '12':newLabels[i]='Dec'
+       	break;
+      
+       default:newLabels[i]='not valid';
+        }
+    }
+    
+   
+    
+   // console.log(newLabels);
+	//console.log(labels6);
+    //console.log(dataPoints6);
+    
+    //global options
+     Chart.defaults.global.legend.position='bottom';
+    // Chart.defaults.global.datasetFill=false;
+    
+    let myChart6=document.getElementById("lineChart1").getContext('2d');
+    
+    let popChart6=new Chart(myChart6,{
+    	type: 'line',
+        data: {
+            labels: newLabels,
+            datasets: [{
+                label: 'Number of Projects',
+                data: dataPoints6,
+                borderColor:'#0C8BE8',
+                backgroundColor:'white',
+                borderWidth: 2
+            }]
+        },
+        options: {
+        	scales: {        
+        xAxes: [{
+            gridLines: {
+                display:false
+            }
+        }],
+        yAxes: [{
+            gridLines: {
+                display:false
+            },
+            ticks: {
+                beginAtZero: true
+            }
+        }]
+               
+            },
+           
+        
+        title: {
+                display: true,
+                text: 'Month Wise project submission status'
+              },
+        layout: {
+                  padding: {
+                      left: 50,
+                      right: 0,
+                      top: 0,
+                      bottom: 0
+                  }
+              },
+              plugins: {
+                  labels: {
+                	  render: 'percentage',
+                	    fontColor: 'white',
+                	    precision: 2
+                  }
+              }
+
+        }
+    });
+
+</script>
+
+<!-- <canvas id="lineChart" width="1600" height="900" style="border:1px solid #000000; position:relative;"></canvas> -->	
+
+
+</body>
+</html>
